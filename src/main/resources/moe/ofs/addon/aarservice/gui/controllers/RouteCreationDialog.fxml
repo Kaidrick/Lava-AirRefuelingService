@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="265.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="moe.ofs.addon.aarservice.gui.controllers.RouteCreationDialog">
+   <children>
+      <GridPane hgap="5.0" prefHeight="137.0" prefWidth="600.0" vgap="5.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="273.0" minWidth="110.0" prefWidth="113.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="485.0" minWidth="322.0" prefWidth="482.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints />
+          <RowConstraints maxHeight="1.7976931348623157E308" />
+        </rowConstraints>
+         <children>
+            <Label text="Route Name" wrapText="true" />
+            <TextField fx:id="routeNameTextField" GridPane.columnIndex="1" />
+            <Label text="Navaid or Waypoint Sequance" wrapText="true" GridPane.rowIndex="1" />
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <children>
+                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <VBox>
+                           <children>
+                              <AnchorPane>
+                                 <children>
+                                    <HBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <TextField fx:id="searchIdentTextField" layoutX="10.0" layoutY="10.0" promptText="Identification" HBox.hgrow="ALWAYS" />
+                                          <TextField fx:id="assignedAltitudeTextField" promptText="Passing Altitude" HBox.hgrow="ALWAYS" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </AnchorPane>
+                           </children>
+                        </VBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0" VBox.vgrow="ALWAYS">
+                           <children>
+                              <ListView fx:id="searchResultListView" layoutX="10.0" layoutY="10.0" />
+                              <ListView fx:id="briefedWaypointListView" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <VBox spacing="5.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#resetIdentSearchAndAltitude" text="Reset" />
+                        <Button mnemonicParsing="false" onAction="#addToBriefedWaypointListView" text="Add As WP" />
+                        <Button mnemonicParsing="false" text="Move Up" />
+                        <Button mnemonicParsing="false" text="Move Down" />
+                        <Button mnemonicParsing="false" onAction="#deleteFromBriefedWaypointListView" text="Delete" />
+                        <Button mnemonicParsing="false" onAction="#cleanAllBriefedWaypointListView" text="Delete All" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+      </GridPane>
+      <Button layoutX="394.0" layoutY="219.0" mnemonicParsing="false" onAction="#generateRoute" prefHeight="25.0" prefWidth="65.0" text="OK" />
+   </children>
+</AnchorPane>
