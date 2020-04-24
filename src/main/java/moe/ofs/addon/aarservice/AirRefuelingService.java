@@ -54,20 +54,12 @@ public class AirRefuelingService implements Plugin, Viewable {
 
     @Override
     public void register() {
-        missionStartObservable = theater -> {
-            System.out.println("ars -> find parking data");
-            dispatcher.test();
-            parkingInfoService.getAllParking().stream()
-                    .filter(p -> p.getAirdromeName().equals("Nellis AFB"))
-                    .filter(p -> p.getTerminalType() == 104)
-                    .forEach(System.out::println);
-        };
-        missionStartObservable.register();
+
     }
 
     @Override
     public void unregister() {
-        missionStartObservable.unregister();
+
     }
 
     @Override
@@ -89,7 +81,7 @@ public class AirRefuelingService implements Plugin, Viewable {
     public Parent getPluginGui() throws IOException {
         if(gui == null) {
             ResourceBundle resourceBundle =
-                    ResourceBundle.getBundle("NavData", new UTF8Control());
+                    ResourceBundle.getBundle("AirRefuelingServiceControlPanel", new UTF8Control());
             gui = fxWeaver.loadView(AirRefuelingServiceControlPanel.class, resourceBundle);
         }
         return gui;

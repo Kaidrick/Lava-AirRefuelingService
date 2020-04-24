@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
@@ -11,9 +12,9 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="265.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="moe.ofs.addon.aarservice.gui.controllers.RouteCreationDialog">
+<AnchorPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="moe.ofs.addon.aarservice.gui.controllers.RouteCreationDialog">
    <children>
-      <GridPane hgap="5.0" prefHeight="137.0" prefWidth="600.0" vgap="5.0">
+      <GridPane hgap="5.0" vgap="5.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="273.0" minWidth="110.0" prefWidth="113.0" />
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="485.0" minWidth="322.0" prefWidth="482.0" />
@@ -21,6 +22,7 @@
         <rowConstraints>
           <RowConstraints />
           <RowConstraints maxHeight="1.7976931348623157E308" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="-Infinity" valignment="CENTER" />
         </rowConstraints>
          <children>
             <Label text="Route Name" wrapText="true" />
@@ -37,7 +39,12 @@
                                     <HBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
                                           <TextField fx:id="searchIdentTextField" layoutX="10.0" layoutY="10.0" promptText="Identification" HBox.hgrow="ALWAYS" />
-                                          <TextField fx:id="assignedAltitudeTextField" promptText="Passing Altitude" HBox.hgrow="ALWAYS" />
+                                          <HBox prefHeight="25.0" prefWidth="195.0" spacing="5.0">
+                                             <children>
+                                                <TextField fx:id="assignedAltitudeTextField" promptText="Altitude" />
+                                                <TextField fx:id="assignedSpeedTextField" promptText="Speed" />
+                                             </children>
+                                          </HBox>
                                        </children>
                                     </HBox>
                                  </children>
@@ -64,8 +71,14 @@
                   </VBox>
                </children>
             </HBox>
+            <Label text="Unit of Measurement" GridPane.rowIndex="2" />
+            <HBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+               <children>
+                  <ComboBox fx:id="systemOfMeasurementComboBox" prefWidth="150.0" />
+                  <Button mnemonicParsing="false" onAction="#generateRoute" prefWidth="65.0" text="Submit" />
+               </children>
+            </HBox>
          </children>
       </GridPane>
-      <Button layoutX="394.0" layoutY="219.0" mnemonicParsing="false" onAction="#generateRoute" prefHeight="25.0" prefWidth="65.0" text="OK" />
    </children>
 </AnchorPane>

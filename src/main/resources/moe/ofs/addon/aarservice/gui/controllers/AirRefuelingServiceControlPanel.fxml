@@ -20,7 +20,7 @@
                            <children>
                               <Button fx:id="addRouteButton" mnemonicParsing="false" onAction="#addTankerRoute" text="Add Route" />
                               <Button fx:id="editRouteButton" mnemonicParsing="false" text="Edit Route" />
-                              <Button fx:id="deleteRouteButton" mnemonicParsing="false" text="Delete Route" />
+                              <Button fx:id="deleteRouteButton" mnemonicParsing="false" onAction="#deleteTankerRoute" text="Delete Route" />
                            </children>
                         </HBox>
                         <ListView fx:id="routeListView" prefHeight="200.0" prefWidth="200.0" />
@@ -37,10 +37,11 @@
                            <children>
                               <Button mnemonicParsing="false" onAction="#addRefuelingService" text="Add Service" />
                               <Button mnemonicParsing="false" text="Edit Service" />
-                              <Button mnemonicParsing="false" text="Delete Service" />
+                              <Button mnemonicParsing="false" onAction="#removeRefuelingService" text="Delete Service" />
+                              <Button mnemonicParsing="false" onAction="#testSpawnTanker" text="Test Spawn Tanker" />
                            </children>
                         </HBox>
-                        <ListView prefHeight="200.0" prefWidth="200.0" />
+                        <ListView fx:id="tankerServiceListView" prefHeight="200.0" prefWidth="200.0" />
                      </children>
                   </VBox>
                </children>

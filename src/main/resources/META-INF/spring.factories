@@ -1,8 +1,10 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 moe.ofs.addon.aarservice.AirRefuelingService,\
 moe.ofs.addon.aarservice.Dispatcher,\
+moe.ofs.addon.aarservice.gui.cells.RefuelingServiceCellFactory,\
 moe.ofs.addon.aarservice.gui.controllers.AirRefuelingServiceControlPanel,\
 moe.ofs.addon.aarservice.gui.controllers.RouteCreationDialog,\
 moe.ofs.addon.aarservice.gui.controllers.TankerServiceCreationDialog,\
+moe.ofs.addon.aarservice.services.MissionPersistentTankerService,\
 moe.ofs.addon.aarservice.services.RefuelingServiceServiceImpl,\
 moe.ofs.addon.aarservice.services.RouteServiceImpl

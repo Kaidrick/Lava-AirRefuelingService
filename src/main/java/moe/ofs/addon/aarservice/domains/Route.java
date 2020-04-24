@@ -3,10 +3,12 @@ package moe.ofs.addon.aarservice.domains;
 
 import lombok.Getter;
 import lombok.Setter;
+import moe.ofs.addon.navdata.domain.NavFix;
 import moe.ofs.backend.domain.BaseEntity;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 /**
  * A route represent a series of GeoPosition that a tanker will fly through
@@ -24,4 +26,11 @@ public class Route extends BaseEntity {
 
     private Queue<BriefedWaypoint> briefedWaypoints = new ArrayDeque<>();
 
+    @Override
+    public String toString() {
+        return "[" + name + "] " +
+                briefedWaypoints.stream()
+                .map(BriefedWaypoint::getNavFix)
+                .map(NavFix::getCode).collect(Collectors.joining(" "));
+    }
 }
