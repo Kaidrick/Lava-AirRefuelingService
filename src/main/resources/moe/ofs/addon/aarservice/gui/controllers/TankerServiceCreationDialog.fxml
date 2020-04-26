@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -23,9 +24,38 @@
       <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <TextField fx:id="tankerMissionNameTextField" promptText="Tanker Mission Name" />
-            <ComboBox fx:id="tankerTypeComboBox" prefWidth="150.0" promptText="Tanker Type" />
-            <ComboBox fx:id="initialAirdromeComboBox" prefWidth="150.0" promptText="Base Airdrome" />
-            <ComboBox fx:id="patternComboBox" prefWidth="150.0" promptText="Orbit Pattern" />
+            <HBox spacing="20.0">
+               <children>
+                  <VBox spacing="5.0">
+                     <children>
+                        <Label text="Airframe Settings" />
+                        <ComboBox fx:id="tankerTypeComboBox" prefWidth="150.0" promptText="Tanker Type" />
+                        <ComboBox fx:id="initialAirdromeComboBox" prefWidth="150.0" promptText="Base Airdrome" />
+                        <ComboBox fx:id="patternComboBox" prefWidth="150.0" promptText="Orbit Pattern" />
+                     </children>
+                  </VBox>
+                  <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label text="Comm" />
+                        <HBox alignment="CENTER_LEFT" spacing="5.0">
+                           <children>
+                              <ComboBox fx:id="tankerCallsignComboBox" promptText="Tanker Callsign" />
+                              <TextField fx:id="tankerRadioFrequencyTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="80.0" promptText="Frequency" />
+                              <Label text="MHz" />
+                           </children>
+                        </HBox>
+                        <HBox spacing="5.0">
+                           <children>
+                              <TextField fx:id="tankerBeaconChannelTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="60.0" promptText="Channel" />
+                              <ComboBox fx:id="tankerBeaconChannelModeComboBox" promptText="Mode" />
+                              <TextField fx:id="beaconMorseCodeTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="25.0" prefWidth="80.0" promptText="Morse Code" />
+                           </children>
+                        </HBox>
+                        <CheckBox fx:id="beaconBearingAvailabilityCheckBox" mnemonicParsing="false" text="Bearing Information" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
             <HBox spacing="5.0">
                <children>
                   <Label text="RTB Fuel Level" />

@@ -12,6 +12,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
+import lombok.extern.slf4j.Slf4j;
 import moe.ofs.addon.aarservice.AirRefuelingService;
 import moe.ofs.addon.aarservice.Dispatcher;
 import moe.ofs.addon.aarservice.domains.DispatchedTanker;
@@ -26,14 +27,14 @@ import moe.ofs.backend.services.MissionDataService;
 import net.rgielen.fxweaver.core.FxControllerAndView;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.controlsfx.control.ToggleSwitch;
 import org.springframework.stereotype.Controller;
 
 import java.net.URL;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.Set;
 
+@Slf4j
 @FxmlView
 @Controller
 public class AirRefuelingServiceControlPanel implements Initializable, Configurable {
@@ -46,6 +47,9 @@ public class AirRefuelingServiceControlPanel implements Initializable, Configura
 
     @FXML
     private Button deleteRouteButton;
+
+    @FXML
+    private ToggleSwitch autoDispatchToggleSwitch;
 
     @FXML
     private ListView<Route> routeListView;
@@ -180,52 +184,36 @@ public class AirRefuelingServiceControlPanel implements Initializable, Configura
         writeFile(serviceSet, "aar_service_entries");
     }
 
-    @FXML
-    private void testSpawnTanker() {
-        TankerService tankerService = tankerServiceListView.getSelectionModel().getSelectedItem();
-
-        if(tankerService == null)
-            return;
-
-        // check if this tanker is already in game
-        Optional<DispatchedTanker> optional =
-                dispatchedTankerMissionDataService.findBy("name",
-                tankerService.getTankerMissionName(), DispatchedTanker.class);
-
-        if(optional.isPresent()) {
-            System.out.println("tanker already exists in mission");
-
-            // only start tracking runtime id but do not respawn tanker unit
-            // what needs to be added to start tracking?
-            // runtime id and holding fix
-
-            // construct tanker service anyway
-            dispatcher.buildMissionGroup(tankerService);
-            dispatcher.resumeDispatch(tankerService, optional.get());
-            System.out.println("resume dispatch info for " +
-                    tankerService.getTankerMissionName());
-
-        } else {
-            System.out.println("dispatch new tanker");
-            dispatcher.dispatch(tankerService);
-        }
-    }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         tankerServiceListView.setCellFactory(lv -> refuelingServiceCellFactory.listView(lv).getObject());
 
-        if(dataFileExists("aar_service_routes")) {
-            Set<Route> routeSet = readFile("aar_service_routes");
-            routeSet.forEach(routeService::save);
-            routeListView.getItems().addAll(routeSet);
+        // initialize list views
+        routeListView.getItems().addAll(routeService.findAll());
+        tankerServiceListView.getItems().addAll(refuelingServiceService.findAll());
+
+
+        // set auto dispatch toggle switch position
+        if(xmlConfigExists("Refueling Service")) {
+            // set auto dispatch toggle switch position
+            boolean autoDispatch =
+                    Boolean.parseBoolean(readConfiguration("Refueling Service", "auto_dispatch"));
+
+            autoDispatchToggleSwitch.selectedProperty().set(autoDispatch);
         }
 
-        if(dataFileExists("aar_service_entries")) {
-            Set<TankerService> serviceSet = readFile("aar_service_entries");
-            serviceSet.forEach(refuelingServiceService::save);
-            tankerServiceListView.getItems().addAll(serviceSet);
-        }
+        // auto dispatch toggle switch save config
+        autoDispatchToggleSwitch.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            writeConfiguration("Refueling Service", "auto_dispatch", newValue.toString());
+
+            // immediately start dispatch if new value is true
+            if(newValue) {
+                refuelingServiceService.findAll().forEach(dispatcher::dispatch);
+            }
+        }));
+
+
+
     }
 
     @Override

@@ -20,6 +20,8 @@ public class TankerService extends BaseEntity {
 
     private CustomPattern customPattern;
 
+    private Comm comm;
+
     public TankerService(Route route, String aircraftType, Integer startingAirdromeId, BriefedWaypoint holdingFix) {
         this.route = route;
         this.aircraftType = aircraftType;

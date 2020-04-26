@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.ToggleSwitch?>
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="moe.ofs.addon.aarservice.gui.controllers.AirRefuelingServiceControlPanel">
    <children>
@@ -13,10 +14,10 @@
          <children>
             <AnchorPane prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <Label text="Routes" />
-                        <HBox>
+                        <HBox spacing="5.0">
                            <children>
                               <Button fx:id="addRouteButton" mnemonicParsing="false" onAction="#addTankerRoute" text="Add Route" />
                               <Button fx:id="editRouteButton" mnemonicParsing="false" text="Edit Route" />
@@ -30,15 +31,20 @@
             </AnchorPane>
             <AnchorPane>
                <children>
-                  <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <Label text="Services" />
-                        <HBox>
+                        <HBox spacing="5.0">
                            <children>
                               <Button mnemonicParsing="false" onAction="#addRefuelingService" text="Add Service" />
                               <Button mnemonicParsing="false" text="Edit Service" />
                               <Button mnemonicParsing="false" onAction="#removeRefuelingService" text="Delete Service" />
-                              <Button mnemonicParsing="false" onAction="#testSpawnTanker" text="Test Spawn Tanker" />
+                              <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                 <children>
+                                    <ToggleSwitch fx:id="autoDispatchToggleSwitch" prefWidth="0.0" />
+                                    <Label text="Auto Dispatch" />
+                                 </children>
+                              </HBox>
                            </children>
                         </HBox>
                         <ListView fx:id="tankerServiceListView" prefHeight="200.0" prefWidth="200.0" />

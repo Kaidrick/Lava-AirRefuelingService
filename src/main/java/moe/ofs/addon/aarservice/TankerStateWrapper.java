@@ -25,11 +25,15 @@ public class TankerStateWrapper {
 
     private final TankerService service;
 
-    ExportUnitUpdateObservable observable;
+    ExportUnitUpdateObservable updateObservable;
+
+    ExportUnitDespawnObservable despawnObservable;
 
     private final DispatchedTanker dispatchedTanker;
 
     private boolean initiated;
+
+    private boolean destroyed;
 
     private PropertyChangeSupport support;
 
@@ -42,7 +46,7 @@ public class TankerStateWrapper {
 
         lastMotionTimestamp = Instant.now();
 
-        observable = (previous, current) -> {
+        updateObservable = (previous, current) -> {
             if(service.getUnit().getId() == current.getRuntimeID()) {
                 double dist = Offset.slantRange(previous.getPosition(), current.getPosition());
                 // timestamp is updated if and only if dist > 1
@@ -51,12 +55,17 @@ public class TankerStateWrapper {
                 }
             }
         };
-        observable.register();
+        updateObservable.register();
 
         // tanker destroyed
-        ExportUnitDespawnObservable despawnObservable = exportObject -> {
+        despawnObservable = exportObject -> {
             if(exportObject.getRuntimeID() == service.getUnit().getId()) {
-                observable.unregister();
+
+                destroyed = true;
+
+                updateObservable.unregister();
+                despawnObservable.unregister();
+
             }
         };
         despawnObservable.register();
@@ -64,11 +73,15 @@ public class TankerStateWrapper {
     }
 
     public void dispose() {
-        observable.unregister();
+        updateObservable.unregister();
     }
 
     public boolean isTankerStuck(int maxWaitTime) {
         return Duration.between(lastMotionTimestamp, Instant.now()).getSeconds() > maxWaitTime;
+    }
+
+    public boolean isTankerDestroyed() {
+        return destroyed;
     }
 
 

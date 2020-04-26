@@ -1,16 +1,14 @@
 package moe.ofs.addon.aarservice;
 
 import com.google.gson.Gson;
-import moe.ofs.addon.aarservice.domains.BriefedWaypoint;
-import moe.ofs.addon.aarservice.domains.CustomPattern;
-import moe.ofs.addon.aarservice.domains.DispatchedTanker;
-import moe.ofs.addon.aarservice.domains.TankerService;
+import moe.ofs.addon.aarservice.domains.*;
 import moe.ofs.backend.domain.ExportObject;
 import moe.ofs.backend.function.coordoffset.Offset;
 import moe.ofs.backend.function.unitconversion.Coordinates;
 import moe.ofs.backend.handlers.*;
 import moe.ofs.backend.logmanager.Logger;
 import moe.ofs.backend.object.*;
+import moe.ofs.backend.object.Route;
 import moe.ofs.backend.object.command.ActivateBeacon;
 import moe.ofs.backend.object.command.ActivateBeaconParams;
 import moe.ofs.backend.object.command.BeaconSystem;
@@ -31,6 +29,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class Dispatcher {
@@ -52,25 +51,37 @@ public class Dispatcher {
         this.parkingInfoService = parkingInfoService;
         this.dispatchedTankerMissionDataService = dispatchedTankerMissionDataService;
 
+
         tankerManageExecutorService = Executors.newSingleThreadScheduledExecutor();
+        tankerManageExecutorService.scheduleWithFixedDelay(this::checkTankerStatus,
+                1, 1, TimeUnit.SECONDS);
 
 
-//        MissionStartObservable missionStartObservable = theater ->
-//                tankerManageExecutorService.scheduleWithFixedDelay(serviceMonitorStep,
-//                        1, 10, TimeUnit.SECONDS);
-//        missionStartObservable.register();
-
-//        GuiServerResetObservable resetObservable = () -> tankerManageExecutorService.shutdownNow();
-//        resetObservable.register();
-//
-//        ControlPanelShutdownObservable shutdownObservable = () -> tankerManageExecutorService.shutdownNow();
-//        shutdownObservable.register();
+        ControlPanelShutdownObservable shutdownObservable = () -> tankerManageExecutorService.shutdownNow();
+        shutdownObservable.register();
 
         BackgroundTaskRestartObservable restartObservable = () -> stateWrapperSet.clear();
         restartObservable.register();
     }
 
+    // dispatcher periodically check the status of tanker
+    // if tanker is stationary for too long, destroy tanker
+    // if a tanker is destroyed (despawn observable), re-dispatch
+    // if a tanker is low on fuel, call rtb
+    // if a tanker is manually recalled, unregister
 
+    // executed periodically to check if tanker is still active
+    public void checkTankerStatus() {
+        stateWrapperSet.forEach(wrapper -> {
+
+            System.out.println("check " + wrapper);
+
+            if(wrapper.isTankerStuck(5) || wrapper.isTankerDestroyed()) {
+                System.out.println("terminate because tanker not active");
+                terminateDispatch(wrapper.getService());
+            }
+        });
+    }
 
 
     public void monitor(TankerStateWrapper wrapper) {
@@ -110,13 +121,18 @@ public class Dispatcher {
                 .filter(parkingInfo -> parkingInfo.getTerminalType() == 104)
                 .findAny().orElseThrow(RuntimeException::new);
 
+        Comm comm = tankerService.getComm();
+
+        // TODO --> set comm for aircraft group
+
         Group.GroupBuilder groupBuilder = new Group.GroupBuilder();
         Unit.UnitBuilder unitBuilder = new Unit.UnitBuilder();
 
         Payload payload = new Payload();
         payload.setChaff(0);
         payload.setFlare(0);
-        payload.setFuel(90700);
+//        payload.setFuel(90700);
+        payload.setFuel(1000);  // test rtb behavior
         payload.setGun(0);
         payload.setPylons(new HashMap<>());
 
@@ -163,21 +179,28 @@ public class Dispatcher {
 
                 // TODO --> pattern and altitude can be overridden
                 orbitParams.setAltitude(tankerService.getHoldingFix().getAssignedAltitude());
+
+                // TODO --> get pattern from tanker service pattern
                 orbitParams.setPattern("Race-Track");
+
                 orbitParams.setSpeed(tankerService.getHoldingFix().getAssignedSpeed());
                 orbit.setParams(orbitParams);
                 orbit.setAuto(false);
                 orbit.setEnabled(true);
                 orbit.setNumber(2);
 
+
                 ActivateBeacon activateBeaconCommand = new ActivateBeacon();
                 ActivateBeaconParams activateBeaconParams = new ActivateBeaconParams();
                 activateBeaconParams.setAirborne(true);
-                activateBeaconParams.setCallsign("TKR");
-                activateBeaconParams.setBearing(true);
-                activateBeaconParams.setChannel(1);
-                activateBeaconParams.setModeChannel("X");
+                activateBeaconParams.setCallsign(comm.getBeaconMorseCode());
+                activateBeaconParams.setBearing(comm.isBearingInfoAvailable());
+                activateBeaconParams.setChannel(comm.getChannel());
+                activateBeaconParams.setModeChannel(comm.getModeChannel().name());
+
+                // TODO --> calculated based on channel number
                 activateBeaconParams.setFrequency(1088000000);
+
                 activateBeaconParams.setSystem(BeaconSystem.TACAN_TANKER.getType());
                 activateBeaconParams.setType(BeaconType.BEACON_TYPE_TACAN.getType());
 
@@ -248,13 +271,12 @@ public class Dispatcher {
 
     // spawn aircraft based on theater name and predefined airport and routes
 
-    // dispatcher periodically check the status of tanker
-    // if tanker is stationary for too long, destroy tanker
-    // if a tanker is destroyed (despawn observable), re-dispatch
-    // if a tanker is low on fuel, call rtb
-    // if a tanker is manually recalled, unregister
-    // if a tanker is manually destroyed, unregister
+
     public void resumeDispatch(TankerService tankerService, DispatchedTanker dispatchedTanker) {
+
+        // resume should fail if mission database has data but tanker is no longer in sim env
+        // if this is the case, redispatch
+
         tankerService.getUnit().setId(dispatchedTanker.getRuntimeId());
 
         // creates link
@@ -263,6 +285,7 @@ public class Dispatcher {
         System.out.println(tankerService + " / " + dispatchedTanker);
     }
 
+    // manually destroy tanker object and data
     public void terminateDispatch(TankerService service) {
         // destroy tanker immediately
         new ServerActionRequest(String.format("Unit.destroy({ id_ = %d })", service.getUnit().getId())).send();
@@ -281,7 +304,6 @@ public class Dispatcher {
             wrapper.dispose();
             stateWrapperSet.remove(wrapper);
         }
-
     }
 
     public void dispatch(TankerService tankerService) {
@@ -289,6 +311,34 @@ public class Dispatcher {
         if(tankerService == null)
             return;
 
+        // check if tanker is already in mission persistent database
+        Optional<DispatchedTanker> optional =
+                dispatchedTankerMissionDataService.findBy("name",
+                        tankerService.getTankerMissionName(), DispatchedTanker.class);
+
+        // if unit in mission persistent database, try resuming link
+        if(optional.isPresent()) {
+
+            // if unit in persistent database and data is available in ExportObjectRepository, resume
+            if(exportObjectRepository.findByRuntimeID((long) optional.get().getRuntimeId()).isPresent()) {
+
+                buildMissionGroup(tankerService);
+                resumeDispatch(tankerService, optional.get());
+                System.out.println("resume dispatch info for " + tankerService.getTankerMissionName());
+
+            } else {
+
+                System.out.println("resume failed for " + tankerService.getTankerMissionName() + ", re-dispatch");
+                deployTanker(tankerService);
+
+            }
+        } else {
+            // dispatch new tanker for this service
+            deployTanker(tankerService);
+        }
+    }
+
+    private void deployTanker(TankerService tankerService) {
         if(tankerService.getUnit() == null)
             buildMissionGroup(tankerService);
 
@@ -316,11 +366,5 @@ public class Dispatcher {
         resumeDispatch(tankerService, dispatchedTanker);
 
         Logger.addon("Tanker Service Dispatched: " + unit + " with Route: " + tankerService.getRoute());
-
-
-        // TODO: add some code to track the status of the aircraft
-        // if it is at mission area, add a radio menu?
-        // if it is shutdown / destroyed, add a new group immediately
-        // if it is out of fuel /
     }
 }

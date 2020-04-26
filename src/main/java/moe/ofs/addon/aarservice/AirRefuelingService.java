@@ -3,8 +3,11 @@ package moe.ofs.addon.aarservice;
 import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import lombok.extern.slf4j.Slf4j;
+import moe.ofs.addon.aarservice.domains.Route;
+import moe.ofs.addon.aarservice.domains.TankerService;
 import moe.ofs.addon.aarservice.gui.controllers.AirRefuelingServiceControlPanel;
-import moe.ofs.addon.navdata.gui.controllers.MainAnchorPane;
+import moe.ofs.addon.aarservice.services.RefuelingServiceService;
+import moe.ofs.addon.aarservice.services.RouteService;
 import moe.ofs.backend.Plugin;
 import moe.ofs.backend.UTF8Control;
 import moe.ofs.backend.Viewable;
@@ -13,8 +16,10 @@ import moe.ofs.backend.services.ParkingInfoService;
 import net.rgielen.fxweaver.core.FxWeaver;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * This AirRefuelingService class is an example of an external addon/plugin for Lava Project
@@ -37,6 +42,7 @@ public class AirRefuelingService implements Plugin, Viewable {
 
     MissionStartObservable missionStartObservable;
 
+
     private Parent gui;
 
     private final FxWeaver fxWeaver;
@@ -46,10 +52,42 @@ public class AirRefuelingService implements Plugin, Viewable {
 
     private final Dispatcher dispatcher;
 
-    public AirRefuelingService(FxWeaver fxWeaver, ParkingInfoService parkingInfoService, Dispatcher dispatcher) {
+    private final RouteService routeService;
+    private final RefuelingServiceService refuelingServiceService;
+
+    public AirRefuelingService(FxWeaver fxWeaver, ParkingInfoService parkingInfoService, Dispatcher dispatcher, RouteService routeService, RefuelingServiceService refuelingServiceService) {
         this.fxWeaver = fxWeaver;
         this.parkingInfoService = parkingInfoService;
         this.dispatcher = dispatcher;
+        this.routeService = routeService;
+        this.refuelingServiceService = refuelingServiceService;
+    }
+
+    @PostConstruct
+    private void initialize() {
+        // load data
+        if(dataFileExists("aar_service_routes")) {
+            Set<Route> routeSet = readFile("aar_service_routes");
+            routeSet.forEach(routeService::save);
+        }
+
+        if(dataFileExists("aar_service_entries")) {
+            Set<TankerService> serviceSet = readFile("aar_service_entries");
+            serviceSet.forEach(refuelingServiceService::save);
+        }
+
+        // execute auto dispatch
+        boolean autoDispatch = Boolean.parseBoolean(readConfiguration("auto_dispatch"));
+
+        System.out.println("autoDispatch = " + autoDispatch);
+        if(autoDispatch) {
+            // auto dispatch on mission start
+            missionStartObservable = theater -> {
+                refuelingServiceService.findAll().forEach(dispatcher::dispatch);
+                log.info("Tanker auto-dispatch complete");
+            };
+            missionStartObservable.register();
+        }
     }
 
     @Override
@@ -59,7 +97,8 @@ public class AirRefuelingService implements Plugin, Viewable {
 
     @Override
     public void unregister() {
-
+        if(missionStartObservable != null)
+            missionStartObservable.unregister();
     }
 
     @Override

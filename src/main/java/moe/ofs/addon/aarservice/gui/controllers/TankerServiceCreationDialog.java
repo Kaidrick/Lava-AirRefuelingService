@@ -7,12 +7,10 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import moe.ofs.addon.aarservice.domains.BriefedWaypoint;
-import moe.ofs.addon.aarservice.domains.CustomPattern;
-import moe.ofs.addon.aarservice.domains.Route;
-import moe.ofs.addon.aarservice.domains.TankerService;
+import moe.ofs.addon.aarservice.domains.*;
 import moe.ofs.addon.aarservice.services.RouteService;
 import moe.ofs.backend.function.unitconversion.Lengths;
+import moe.ofs.backend.object.tasks.TacanModeChannel;
 import moe.ofs.backend.object.tasks.main.OrbitPattern;
 import moe.ofs.backend.object.unitofmeasure.Length;
 import moe.ofs.backend.services.ParkingInfoService;
@@ -37,6 +35,24 @@ public class TankerServiceCreationDialog implements Initializable {
 
     @FXML
     private ComboBox<String> initialAirdromeComboBox;
+
+    @FXML
+    private ComboBox<String> tankerCallsignComboBox;
+
+    @FXML
+    private TextField tankerRadioFrequencyTextField;
+
+    @FXML
+    private TextField tankerBeaconChannelTextField;
+
+    @FXML
+    private ComboBox<TacanModeChannel> tankerBeaconChannelModeComboBox;
+
+    @FXML
+    private TextField beaconMorseCodeTextField;
+
+    @FXML
+    private CheckBox beaconBearingAvailabilityCheckBox;
 
     @FXML
     private ToggleSwitch customOrbitPatternToggleSwitch;
@@ -114,6 +130,23 @@ public class TankerServiceCreationDialog implements Initializable {
 
             tankerService.setTankerMissionName(tankerMissionName);
 
+            Map<Object, Object> callsign = new HashMap<>();
+            callsign.put(1, 1);
+            callsign.put(2, 1);
+            callsign.put(3, 1);
+            callsign.put("name", "Texaco11");  // TODO --> read from combo box
+
+            Comm comm = Comm.builder()
+                    .callsign(callsign)
+                    .beaconMorseCode(beaconMorseCodeTextField.getText())
+                    .bearingInfoAvailable(beaconBearingAvailabilityCheckBox.isSelected())
+                    .channel(Integer.parseInt(tankerBeaconChannelTextField.getText()))
+                    .modeChannel(tankerBeaconChannelModeComboBox.getSelectionModel().getSelectedItem())
+                    .frequency((long) (Double.parseDouble(tankerRadioFrequencyTextField.getText()) * 1E6))
+                    .build();
+
+            tankerService.setComm(comm);
+
             if(customOrbitPatternToggleSwitch.isSelected()) {
                 if(!tankerPatternAltitudeTextField.getText().isEmpty() &&
                         !tankerPatternLegLengthTextField.getText().isEmpty()) {
@@ -154,7 +187,9 @@ public class TankerServiceCreationDialog implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        patternComboBox.getItems().addAll(OrbitPattern.RACE_TRACK, OrbitPattern.CIRCULAR);
+        tankerBeaconChannelModeComboBox.getItems().addAll(TacanModeChannel.values());
+
+        patternComboBox.getItems().addAll(OrbitPattern.values());
 
         patternAltitudeUnitComboBox.getItems().addAll(Length.FEET, Length.METERS);
         patternLegLengthUnitComboBox.getItems().addAll(Length.NAUTICAL_MILES, Length.KILOMETERS);
