@@ -246,7 +246,7 @@ public class TankerServiceCreationDialog implements Initializable {
 
         patternHeadingSlider.valueProperty().addListener(((observable, oldValue, newValue) -> {
             int inbound = newValue.intValue();
-            int outbound = 360 - inbound;
+            int outbound = inbound < 180 ? inbound + 180 : inbound - 180;
 
             patternInboundLabel.setText(String.format("%03d", inbound));
             patternOutboundLabel.setText(String.format("%03d", outbound));
