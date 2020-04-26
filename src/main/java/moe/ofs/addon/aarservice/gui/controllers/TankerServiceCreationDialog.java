@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import moe.ofs.addon.aarservice.domains.*;
+import moe.ofs.addon.aarservice.gui.cells.AnchorPointCell;
 import moe.ofs.addon.aarservice.services.RouteService;
 import moe.ofs.backend.function.unitconversion.Lengths;
 import moe.ofs.backend.object.tasks.TacanModeChannel;
@@ -186,6 +187,8 @@ public class TankerServiceCreationDialog implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        anchorPointListView.setCellFactory(AnchorPointCell::new);
 
         tankerBeaconChannelModeComboBox.getItems().addAll(TacanModeChannel.values());
 
