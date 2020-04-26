@@ -357,6 +357,10 @@ public class Dispatcher {
                 dispatchedTankerMissionDataService.findBy("name",
                         tankerService.getTankerMissionName(), DispatchedTanker.class);
 
+
+        // FIXME --> if this occurs on application start, export object repository may not have data yet
+        // FIXME --> a better way to do this is probably explicitly query DCS for unit existence
+
         // if unit in mission persistent database, try resuming link
         if(optional.isPresent()) {
 
@@ -369,9 +373,22 @@ public class Dispatcher {
 
             } else {
 
-                System.out.println("resume failed for " + tankerService.getTankerMissionName() + ", re-dispatch");
-                deployTanker(tankerService);
+                // TODO --> export object repository does not have data, query DCS
+                int runtimeId = optional.get().getRuntimeId();
 
+                System.out.println("checking " + runtimeId);
+
+                boolean unitExistInEnv =
+                        new ServerDataRequest(String.format("return tostring(Unit.isExist({ id_ = %d }))",
+                                optional.get().getRuntimeId())).getAsBoolean();
+
+                if(unitExistInEnv) {
+                    resumeDispatch(tankerService, optional.get());
+                    System.out.println("resume dispatch info for " + tankerService.getTankerMissionName());
+                } else {
+                    System.out.println("resume failed for " + tankerService.getTankerMissionName() + ", re-dispatch");
+                    deployTanker(tankerService);
+                }
             }
         } else {
             // dispatch new tanker for this service
