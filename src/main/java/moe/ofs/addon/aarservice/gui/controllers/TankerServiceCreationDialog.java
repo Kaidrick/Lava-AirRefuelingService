@@ -22,6 +22,7 @@ import org.springframework.stereotype.Controller;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 @FxmlView
@@ -38,7 +39,7 @@ public class TankerServiceCreationDialog implements Initializable {
     private ComboBox<String> initialAirdromeComboBox;
 
     @FXML
-    private ComboBox<String> tankerCallsignComboBox;
+    private ComboBox<TankerCallsign> tankerCallsignComboBox;
 
     @FXML
     private TextField tankerRadioFrequencyTextField;
@@ -100,7 +101,7 @@ public class TankerServiceCreationDialog implements Initializable {
 
     private TankerService tankerService;
 
-    Map<String, Integer> airdromeMap = new HashMap<>();
+    private Map<String, Integer> airdromeMap = new HashMap<>();
 
     public TankerServiceCreationDialog(RouteService routeService, ParkingInfoService parkingInfoService) {
         this.routeService = routeService;
@@ -109,6 +110,43 @@ public class TankerServiceCreationDialog implements Initializable {
 
     public TankerService getResult() {
         return tankerService;
+    }
+
+    private Optional<String> getAirdromeNameById(int id) {
+        return airdromeMap.entrySet().stream()
+                .filter(stringIntegerEntry -> stringIntegerEntry.getValue() == id)
+                .findAny().map(Map.Entry::getKey);
+    }
+
+    public void loadData(TankerService tankerService) {
+        tankerMissionNameTextField.setText(tankerService.getTankerMissionName());
+        tankerTypeComboBox.getSelectionModel().select(tankerService.getAircraftType());
+
+        Optional<String> airdromeNameOptional = getAirdromeNameById(tankerService.getStartingAirdromeId());
+        airdromeNameOptional.ifPresent(s -> initialAirdromeComboBox.getSelectionModel().select(s));
+
+        patternComboBox.getSelectionModel().select(OrbitPattern.RACE_TRACK);
+
+        Comm comm = tankerService.getComm();
+        tankerRadioFrequencyTextField.setText(String.valueOf(comm.getFrequency()));
+        tankerBeaconChannelTextField.setText(String.valueOf(comm.getChannel()));
+        tankerBeaconChannelModeComboBox.getSelectionModel().select(comm.getModeChannel());
+        beaconMorseCodeTextField.setText(comm.getBeaconMorseCode());
+        beaconBearingAvailabilityCheckBox.setSelected(comm.isBearingInfoAvailable());
+
+        // get route with the same name
+
+        routeListView.getSelectionModel().select(tankerService.getRoute());
+        anchorPointListView.getSelectionModel().select(tankerService.getHoldingFix());
+
+        CustomPattern pattern;
+        if((pattern = tankerService.getCustomPattern()) != null) {
+            customOrbitPatternToggleSwitch.selectedProperty().set(true);
+
+            patternHeadingSlider.setValue(pattern.getPatternInbound());
+            tankerPatternAltitudeTextField.setText(String.valueOf(pattern.getPatternAltitude()));
+            tankerPatternLegLengthTextField.setText(String.valueOf(pattern.getPatternLegLength()));
+        }
     }
 
     @FXML
@@ -132,10 +170,10 @@ public class TankerServiceCreationDialog implements Initializable {
             tankerService.setTankerMissionName(tankerMissionName);
 
             Map<Object, Object> callsign = new HashMap<>();
-            callsign.put(1, 1);
+            callsign.put(1, tankerCallsignComboBox.getValue().getIndex());
             callsign.put(2, 1);
             callsign.put(3, 1);
-            callsign.put("name", "Texaco11");  // TODO --> read from combo box
+            callsign.put("name", tankerCallsignComboBox.getValue() + "11");
 
             Comm comm = Comm.builder()
                     .callsign(callsign)
@@ -215,8 +253,6 @@ public class TankerServiceCreationDialog implements Initializable {
         }));
 
 
-
-
         routeListView.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
             if(newValue != null) {
                 anchorPointListView.getItems().clear();
@@ -228,11 +264,18 @@ public class TankerServiceCreationDialog implements Initializable {
 
         routeListView.getItems().addAll(routeService.findAll());
 
+        tankerTypeComboBox.getItems().addAll(
+                // NATO
+                "KC-135",
+                "KC135MPRS",
+                "KC130",
+                "S-3B Tanker",
 
-        // TODO --> pull type from defined data? check unit.lua definition?
-        tankerTypeComboBox.getItems().add("KC-135");
-        tankerTypeComboBox.getItems().add("KC-130");
+                // Russian
+                "IL-78M"
+        );
 
+        tankerCallsignComboBox.getItems().addAll(TankerCallsign.values());
 
         parkingInfoService.getAllParking()
                 .forEach(parkingInfo ->

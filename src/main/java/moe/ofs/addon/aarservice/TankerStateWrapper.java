@@ -1,5 +1,6 @@
 package moe.ofs.addon.aarservice;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import moe.ofs.addon.aarservice.domains.DispatchedTanker;
@@ -8,9 +9,9 @@ import moe.ofs.backend.function.coordoffset.Offset;
 import moe.ofs.backend.handlers.ExportUnitDespawnObservable;
 import moe.ofs.backend.handlers.ExportUnitUpdateObservable;
 
-import java.beans.PropertyChangeSupport;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Objects;
 
 /**
  * TankerStateWrapper monitors and controls the state of tanker mission
@@ -34,8 +35,6 @@ public class TankerStateWrapper {
     private boolean initiated;
 
     private boolean destroyed;
-
-    private PropertyChangeSupport support;
 
     // a executor service will check timestamp periodically
     private Instant lastMotionTimestamp;
@@ -86,4 +85,20 @@ public class TankerStateWrapper {
 
 
     // unregister if tanker is deleted, recalled or destroyed, or mission restarted
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TankerStateWrapper wrapper = (TankerStateWrapper) o;
+
+        return Objects.equals(service, wrapper.service);
+    }
+
+    @Override
+    public int hashCode() {
+        return service != null ? service.hashCode() : 0;
+    }
 }

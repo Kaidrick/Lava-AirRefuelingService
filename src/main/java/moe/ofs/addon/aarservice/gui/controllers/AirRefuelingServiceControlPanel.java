@@ -124,6 +124,11 @@ public class AirRefuelingServiceControlPanel implements Initializable, Configura
     }
 
     @FXML
+    private void editTankerRoute(ActionEvent actionEvent) {
+
+    }
+
+    @FXML
     private void deleteTankerRoute(ActionEvent actionEvent) {
         Route route = routeListView.getSelectionModel().getSelectedItem();
         if(route != null) {
@@ -173,11 +178,54 @@ public class AirRefuelingServiceControlPanel implements Initializable, Configura
     }
 
     @FXML
+    private void editRefuleingService(ActionEvent actionEvent) {
+        Node source = (Node) actionEvent.getSource();
+        Stage parent  = (Stage) source.getScene().getWindow();
+
+        FxControllerAndView<TankerServiceCreationDialog, AnchorPane> fxControllerAndView =
+                fxWeaver.load(TankerServiceCreationDialog.class);
+
+        tankerServiceCreationDialog = fxControllerAndView.getController();
+
+        Scene scene = new Scene(fxControllerAndView.getView().orElseThrow(RuntimeException::new));
+        Stage stage = new Stage();
+
+        stage.getIcons().add(airRefuelingService.getIcon());
+
+        JMetro jMetro = new JMetro(Style.LIGHT);
+        jMetro.setScene(scene);
+
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        TankerService selectedItem = tankerServiceListView.getSelectionModel().getSelectedItem();
+        if(selectedItem == null)
+            return;
+
+        tankerServiceCreationDialog.loadData(selectedItem);
+
+        StageControl.showOnParentCenterAndWait(stage, parent);
+
+        TankerService tankerService = tankerServiceCreationDialog.getResult();
+        if(tankerService != null) {
+            refuelingServiceService.save(tankerService);
+
+            System.out.println("refuelingServiceService.findAll() = " + refuelingServiceService.findAll());
+
+            HashSet<TankerService> serviceSet =
+                    (HashSet<TankerService>) refuelingServiceService.findAll();
+            writeFile(serviceSet, "aar_service_entries");
+        }
+    }
+
+    @FXML
     private void removeRefuelingService(ActionEvent actionEvent) {
         TankerService service = tankerServiceListView.getSelectionModel().getSelectedItem();
 
         refuelingServiceService.delete(service);
         tankerServiceListView.getItems().remove(service);
+
+        System.out.println("refuelingServiceService = " + refuelingServiceService.findAll());
 
         HashSet<TankerService> serviceSet =
                 (HashSet<TankerService>) refuelingServiceService.findAll();
@@ -211,9 +259,6 @@ public class AirRefuelingServiceControlPanel implements Initializable, Configura
                 refuelingServiceService.findAll().forEach(dispatcher::dispatch);
             }
         }));
-
-
-
     }
 
     @Override

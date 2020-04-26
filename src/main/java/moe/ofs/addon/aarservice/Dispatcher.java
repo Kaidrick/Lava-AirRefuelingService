@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import moe.ofs.addon.aarservice.domains.*;
 import moe.ofs.backend.domain.ExportObject;
 import moe.ofs.backend.function.coordoffset.Offset;
+import moe.ofs.backend.function.spawncontrol.SpawnManager;
 import moe.ofs.backend.function.unitconversion.Coordinates;
 import moe.ofs.backend.handlers.BackgroundTaskRestartObservable;
 import moe.ofs.backend.handlers.ControlPanelShutdownObservable;
@@ -27,7 +28,9 @@ import moe.ofs.backend.services.ParkingInfoService;
 import moe.ofs.backend.util.LuaScripts;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +38,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 public class Dispatcher {
+
+    private static final int MAX_TANKER_STATIONARY_TIME = 180;
 
     private final ExportObjectRepository exportObjectRepository;
 
@@ -44,13 +49,22 @@ public class Dispatcher {
 
     private final ParkingInfoService parkingInfoService;
 
+    private final SpawnManager spawnManager;
+
     private final MissionDataService<DispatchedTanker> dispatchedTankerMissionDataService;
 
+
+    // delay spawn impl
+    private final List<TankerService> delayedSpawnList = new CopyOnWriteArrayList<>();
+    private ScheduledExecutorService delayedSpawnExecutorService;
+
+
     public Dispatcher(ExportObjectRepository exportObjectRepository, ParkingInfoService parkingInfoService,
-                      MissionDataService<DispatchedTanker> dispatchedTankerMissionDataService) {
+                      SpawnManager spawnManager, MissionDataService<DispatchedTanker> dispatchedTankerMissionDataService) {
 
         this.exportObjectRepository = exportObjectRepository;
         this.parkingInfoService = parkingInfoService;
+        this.spawnManager = spawnManager;
         this.dispatchedTankerMissionDataService = dispatchedTankerMissionDataService;
 
 
@@ -66,6 +80,13 @@ public class Dispatcher {
         restartObservable.register();
     }
 
+
+    @PreDestroy
+    public void cleanUp() {
+        if(delayedSpawnExecutorService != null)
+            delayedSpawnExecutorService.shutdownNow();
+    }
+
     // dispatcher periodically check the status of tanker
     // if tanker is stationary for too long, destroy tanker
     // if a tanker is destroyed (despawn observable), re-dispatch
@@ -79,7 +100,7 @@ public class Dispatcher {
             System.out.println("check " + wrapper);
 
             // automatically destroy tanker if it's asserted to be stuck or destroyed
-            if(wrapper.isTankerStuck(30) || wrapper.isTankerDestroyed()) {
+            if(wrapper.isTankerStuck(MAX_TANKER_STATIONARY_TIME) || wrapper.isTankerDestroyed()) {
                 log.info("Terminate tanker mission " + wrapper.getService().getTankerMissionName() +
                         " because tanker is no longer active: " + wrapper.getService().getUnit().getId());
 
@@ -142,8 +163,7 @@ public class Dispatcher {
         Payload payload = new Payload();
         payload.setChaff(0);
         payload.setFlare(0);
-        payload.setFuel(90700);
-//        payload.setFuel(1000);  // test rtb behavior
+        payload.setFuel(90700);  // TODO --> get fuel data from lua
         payload.setGun(0);
         payload.setPylons(new HashMap<>());
 
@@ -259,6 +279,8 @@ public class Dispatcher {
             }
         });
 
+        System.out.println(comm.getCallsign());
+
 
         Unit unit = unitBuilder.setParking(parking.getParkingId())
                 .setPos(parking.getPosition().getX(), parking.getPosition().getZ())
@@ -266,7 +288,9 @@ public class Dispatcher {
                 .setSkill(Unit.Skill.HIGH)
                 .setType(tankerService.getAircraftType())
                 .setPayload(payload)
+                .setCallsign(comm.getCallsign())
                 .setName(tankerService.getTankerMissionName()).build();
+
 
         tankerService.setUnit(unit);
 
@@ -274,6 +298,7 @@ public class Dispatcher {
         units.add(unit);
 
         return groupBuilder.setUnits(units)
+                .setTask("Refueling")
                 .setCategory(Group.Category.AIRPLANE)
                 .setName(tankerService.getTankerMissionName())
                 .setRoute(route)
@@ -306,7 +331,6 @@ public class Dispatcher {
         // destroy tanker immediately
         new ServerActionRequest(String.format("Unit.destroy({ id_ = %d })", service.getUnit().getId())).send();
 
-
         // dispose and remove wrapper
         Optional<TankerStateWrapper> optional = stateWrapperSet.stream()
                 .filter(wrapper -> wrapper.getService().equals(service)).findAny();
@@ -316,6 +340,7 @@ public class Dispatcher {
 
             dispatchedTankerMissionDataService.deleteBy("runtime_id",
                     (long) wrapper.getDispatchedTanker().getRuntimeId());
+
 
             wrapper.dispose();
             stateWrapperSet.remove(wrapper);
@@ -361,6 +386,24 @@ public class Dispatcher {
         Gson gson = new Gson();
 
         Group group = buildMissionGroup(tankerService);
+
+        // explicitly query dcs to search object
+        Point spawnPoint = group.getRoute().getPoint(0);
+
+        if(!spawnManager.isSafeSpawn(new Vector3D(spawnPoint.getX(), 0, spawnPoint.getY()), 10)) {
+            System.out.println("unsafe spawn for " + tankerService + ", delay spawn");
+
+//            delayedSpawnList.add(tankerService);
+
+            // create scheduled executor service if there isn't any
+            if(delayedSpawnExecutorService == null) {
+                delayedSpawnExecutorService = Executors.newSingleThreadScheduledExecutor();
+            }
+            // delay 30 seconds before next try
+            delayedSpawnExecutorService.schedule(() -> dispatch(tankerService), 30, TimeUnit.SECONDS);
+
+            return;
+        }
 
         ServerDataRequest request = new ServerDataRequest(
                 LuaScripts.loadAndPrepare("spawn_control/spawn_group.lua", gson.toJson(group))

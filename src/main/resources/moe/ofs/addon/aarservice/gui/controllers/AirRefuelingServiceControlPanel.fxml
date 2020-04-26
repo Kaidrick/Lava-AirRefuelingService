@@ -20,7 +20,7 @@
                         <HBox spacing="5.0">
                            <children>
                               <Button fx:id="addRouteButton" mnemonicParsing="false" onAction="#addTankerRoute" text="Add Route" />
-                              <Button fx:id="editRouteButton" mnemonicParsing="false" text="Edit Route" />
+                              <Button fx:id="editRouteButton" mnemonicParsing="false" onAction="#editTankerRoute" text="Edit Route" />
                               <Button fx:id="deleteRouteButton" mnemonicParsing="false" onAction="#deleteTankerRoute" text="Delete Route" />
                            </children>
                         </HBox>
@@ -37,7 +37,7 @@
                         <HBox spacing="5.0">
                            <children>
                               <Button mnemonicParsing="false" onAction="#addRefuelingService" text="Add Service" />
-                              <Button mnemonicParsing="false" text="Edit Service" />
+                              <Button mnemonicParsing="false" onAction="#editRefuleingService" text="Edit Service" />
                               <Button mnemonicParsing="false" onAction="#removeRefuelingService" text="Delete Service" />
                               <HBox alignment="CENTER_LEFT" spacing="5.0">
                                  <children>
