@@ -13,7 +13,7 @@ import java.util.Map;
 @Builder
 public class Comm implements Serializable {
     private Map<Object, Object> callsign;
-    private long frequency;
+    private double frequency;
     private int channel;
     private TacanModeChannel modeChannel;
     private String beaconMorseCode;

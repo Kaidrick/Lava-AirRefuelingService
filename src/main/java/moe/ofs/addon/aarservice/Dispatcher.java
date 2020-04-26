@@ -79,7 +79,7 @@ public class Dispatcher {
             System.out.println("check " + wrapper);
 
             // automatically destroy tanker if it's asserted to be stuck or destroyed
-            if(wrapper.isTankerStuck(5) || wrapper.isTankerDestroyed()) {
+            if(wrapper.isTankerStuck(30) || wrapper.isTankerDestroyed()) {
                 log.info("Terminate tanker mission " + wrapper.getService().getTankerMissionName() +
                         " because tanker is no longer active: " + wrapper.getService().getUnit().getId());
 
@@ -142,8 +142,8 @@ public class Dispatcher {
         Payload payload = new Payload();
         payload.setChaff(0);
         payload.setFlare(0);
-//        payload.setFuel(90700);
-        payload.setFuel(1000);  // test rtb behavior
+        payload.setFuel(90700);
+//        payload.setFuel(1000);  // test rtb behavior
         payload.setGun(0);
         payload.setPylons(new HashMap<>());
 
@@ -209,8 +209,8 @@ public class Dispatcher {
                 activateBeaconParams.setChannel(comm.getChannel());
                 activateBeaconParams.setModeChannel(comm.getModeChannel().name());
 
-                // TODO --> calculated based on channel number
-                activateBeaconParams.setFrequency(1088000000);
+                // TODO --> extract method
+                activateBeaconParams.setFrequency((long) ((1087 + comm.getChannel()) * 1E6));
 
                 activateBeaconParams.setSystem(BeaconSystem.TACAN_TANKER.getType());
                 activateBeaconParams.setType(BeaconType.BEACON_TYPE_TACAN.getType());
@@ -277,6 +277,7 @@ public class Dispatcher {
                 .setCategory(Group.Category.AIRPLANE)
                 .setName(tankerService.getTankerMissionName())
                 .setRoute(route)
+                .setFrequency(comm.getFrequency())
                 .build();
     }
 

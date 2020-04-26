@@ -143,7 +143,7 @@ public class TankerServiceCreationDialog implements Initializable {
                     .bearingInfoAvailable(beaconBearingAvailabilityCheckBox.isSelected())
                     .channel(Integer.parseInt(tankerBeaconChannelTextField.getText()))
                     .modeChannel(tankerBeaconChannelModeComboBox.getSelectionModel().getSelectedItem())
-                    .frequency((long) (Double.parseDouble(tankerRadioFrequencyTextField.getText()) * 1E6))
+                    .frequency(Double.parseDouble(tankerRadioFrequencyTextField.getText()))
                     .build();
 
             tankerService.setComm(comm);
