@@ -1,14 +1,15 @@
 package moe.ofs.addon.aarservice;
 
 import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
 import moe.ofs.addon.aarservice.domains.*;
 import moe.ofs.backend.domain.ExportObject;
 import moe.ofs.backend.function.coordoffset.Offset;
 import moe.ofs.backend.function.unitconversion.Coordinates;
-import moe.ofs.backend.handlers.*;
+import moe.ofs.backend.handlers.BackgroundTaskRestartObservable;
+import moe.ofs.backend.handlers.ControlPanelShutdownObservable;
 import moe.ofs.backend.logmanager.Logger;
 import moe.ofs.backend.object.*;
-import moe.ofs.backend.object.Route;
 import moe.ofs.backend.object.command.ActivateBeacon;
 import moe.ofs.backend.object.command.ActivateBeaconParams;
 import moe.ofs.backend.object.command.BeaconSystem;
@@ -31,6 +32,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Component
 public class Dispatcher {
 
@@ -76,9 +78,18 @@ public class Dispatcher {
 
             System.out.println("check " + wrapper);
 
+            // automatically destroy tanker if it's asserted to be stuck or destroyed
             if(wrapper.isTankerStuck(5) || wrapper.isTankerDestroyed()) {
-                System.out.println("terminate because tanker not active");
+                log.info("Terminate tanker mission " + wrapper.getService().getTankerMissionName() +
+                        " because tanker is no longer active: " + wrapper.getService().getUnit().getId());
+
                 terminateDispatch(wrapper.getService());
+
+                // dispatch new tanker
+                dispatch(wrapper.getService());
+
+                log.info("Auto re-dispatching tanker service: " + wrapper.getService().getTankerMissionName() +
+                        ", new unit runtime id: " + wrapper.getService().getUnit().getId());
             }
         });
     }
