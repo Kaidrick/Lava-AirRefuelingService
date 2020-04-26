@@ -46,6 +46,8 @@ public class RefuelingServiceCell extends ListCell<TankerService> {
             dispatchButton.setOnAction(event -> dispatcher.dispatch(item));
             terminateButton.setOnAction(event -> dispatcher.terminateDispatch(item));
 
+            terminateButton.setStyle("-fx-background-color: #be3a42; -fx-text-fill: #ffffff;");
+
             setGraphic(mainHBox);
         }
     }

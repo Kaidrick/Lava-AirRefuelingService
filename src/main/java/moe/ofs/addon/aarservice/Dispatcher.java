@@ -298,6 +298,10 @@ public class Dispatcher {
 
     // manually destroy tanker object and data
     public void terminateDispatch(TankerService service) {
+
+        // FIXME
+        if(service.getUnit() == null) return;
+
         // destroy tanker immediately
         new ServerActionRequest(String.format("Unit.destroy({ id_ = %d })", service.getUnit().getId())).send();
 
