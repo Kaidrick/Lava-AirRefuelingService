@@ -22,8 +22,10 @@ import moe.ofs.addon.aarservice.gui.cells.RefuelingServiceCellFactory;
 import moe.ofs.addon.aarservice.services.RefuelingServiceService;
 import moe.ofs.addon.aarservice.services.RouteService;
 import moe.ofs.backend.Configurable;
+import moe.ofs.backend.UTF8Control;
 import moe.ofs.backend.interaction.StageControl;
 import moe.ofs.backend.services.MissionDataService;
+import moe.ofs.backend.util.I18n;
 import net.rgielen.fxweaver.core.FxControllerAndView;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -38,6 +40,9 @@ import java.util.ResourceBundle;
 @FxmlView
 @Controller
 public class AirRefuelingServiceControlPanel implements Initializable, Configurable {
+
+    @FXML
+    private AnchorPane mainControlPanelContainer;
 
     @FXML
     private Button addRouteButton;
@@ -94,7 +99,8 @@ public class AirRefuelingServiceControlPanel implements Initializable, Configura
         Stage parent  = (Stage) source.getScene().getWindow();
 
         FxControllerAndView<RouteCreationDialog, AnchorPane> fxControllerAndView =
-                fxWeaver.load(RouteCreationDialog.class);
+                fxWeaver.load(RouteCreationDialog.class,
+                        ResourceBundle.getBundle("AirRefuelingServiceControlPanel"));
 
         routeCreationDialog = fxControllerAndView.getController();
 
@@ -146,7 +152,8 @@ public class AirRefuelingServiceControlPanel implements Initializable, Configura
         Stage parent  = (Stage) source.getScene().getWindow();
 
         FxControllerAndView<TankerServiceCreationDialog, AnchorPane> fxControllerAndView =
-                fxWeaver.load(TankerServiceCreationDialog.class);
+                fxWeaver.load(TankerServiceCreationDialog.class,
+                        ResourceBundle.getBundle("AirRefuelingServiceControlPanel"));
 
         tankerServiceCreationDialog = fxControllerAndView.getController();
 
@@ -182,7 +189,8 @@ public class AirRefuelingServiceControlPanel implements Initializable, Configura
         Stage parent  = (Stage) source.getScene().getWindow();
 
         FxControllerAndView<TankerServiceCreationDialog, AnchorPane> fxControllerAndView =
-                fxWeaver.load(TankerServiceCreationDialog.class);
+                fxWeaver.load(TankerServiceCreationDialog.class,
+                        ResourceBundle.getBundle("AirRefuelingServiceControlPanel"));
 
         tankerServiceCreationDialog = fxControllerAndView.getController();
 
@@ -257,6 +265,15 @@ public class AirRefuelingServiceControlPanel implements Initializable, Configura
             if(newValue) {
                 refuelingServiceService.findAll().forEach(dispatcher::dispatch);
             }
+        }));
+
+        I18n.localeProperty().addListener(((observable, oldValue, newValue) -> {
+            ResourceBundle bundle =
+                    ResourceBundle.getBundle("AirRefuelingServiceControlPanel", newValue, new UTF8Control());
+
+            log.info("call pane container for " + bundle.getLocale());
+
+            I18n.toPaneOrNotToPane(mainControlPanelContainer, bundle);
         }));
     }
 

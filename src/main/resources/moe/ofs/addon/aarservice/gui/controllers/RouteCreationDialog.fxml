@@ -25,9 +25,9 @@
             <RowConstraints maxHeight="1.7976931348623157E308" minHeight="-Infinity" valignment="CENTER" />
         </rowConstraints>
          <children>
-            <Label text="Route Name" wrapText="true" />
+            <Label fx:id="routeNameLabel" text="%routeNameLabel" wrapText="true" />
             <TextField fx:id="routeNameTextField" GridPane.columnIndex="1" />
-            <Label text="Navaid or Waypoint Sequance" wrapText="true" GridPane.rowIndex="1" />
+            <Label fx:id="navWpSeqLabel" text="%navWpSeqLabel" wrapText="true" GridPane.rowIndex="1" />
             <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <children>
                   <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
@@ -38,11 +38,11 @@
                                  <children>
                                     <HBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <TextField fx:id="searchIdentTextField" layoutX="10.0" layoutY="10.0" promptText="Identification" HBox.hgrow="ALWAYS" />
+                                          <TextField fx:id="searchIdentTextField" layoutX="10.0" layoutY="10.0" promptText="%searchIdentTextField" HBox.hgrow="ALWAYS" />
                                           <HBox prefHeight="25.0" prefWidth="195.0" spacing="5.0">
                                              <children>
-                                                <TextField fx:id="assignedAltitudeTextField" promptText="Altitude" />
-                                                <TextField fx:id="assignedSpeedTextField" promptText="Speed" />
+                                                <TextField fx:id="assignedAltitudeTextField" promptText="%assignedAltitudeTextField" />
+                                                <TextField fx:id="assignedSpeedTextField" promptText="%assignedSpeedTextField" />
                                              </children>
                                           </HBox>
                                        </children>
@@ -61,21 +61,21 @@
                   </VBox>
                   <VBox spacing="5.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#resetIdentSearchAndAltitude" text="Reset" />
-                        <Button mnemonicParsing="false" onAction="#addToBriefedWaypointListView" text="Add As WP" />
-                        <Button mnemonicParsing="false" text="Move Up" />
-                        <Button mnemonicParsing="false" text="Move Down" />
-                        <Button mnemonicParsing="false" onAction="#deleteFromBriefedWaypointListView" text="Delete" />
-                        <Button mnemonicParsing="false" onAction="#cleanAllBriefedWaypointListView" text="Delete All" />
+                        <Button fx:id="resetButton" mnemonicParsing="false" onAction="#resetIdentSearchAndAltitude" text="%resetButton" />
+                        <Button fx:id="addWpButton" mnemonicParsing="false" onAction="#addToBriefedWaypointListView" text="%addWpButton" />
+                        <Button fx:id="moveUpButton" mnemonicParsing="false" text="%moveUpButton" />
+                        <Button fx:id="moveDownButton" mnemonicParsing="false" text="%moveDownButton" />
+                        <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#deleteFromBriefedWaypointListView" text="%deleteButton" />
+                        <Button fx:id="deleteAllButton" mnemonicParsing="false" onAction="#cleanAllBriefedWaypointListView" text="%deleteAllButton" />
                      </children>
                   </VBox>
                </children>
             </HBox>
-            <Label text="Unit of Measurement" GridPane.rowIndex="2" />
+            <Label fx:id="uomLabel" text="%uomLabel" GridPane.rowIndex="2" />
             <HBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="CENTER">
                <children>
                   <ComboBox fx:id="systemOfMeasurementComboBox" prefWidth="150.0" />
-                  <Button mnemonicParsing="false" onAction="#generateRoute" prefWidth="65.0" text="Submit" />
+                  <Button fx:id="submitButton" mnemonicParsing="false" onAction="#generateRoute" prefWidth="65.0" text="%submitButton" />
                </children>
             </HBox>
          </children>

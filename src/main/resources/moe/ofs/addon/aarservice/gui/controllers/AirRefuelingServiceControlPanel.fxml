@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.ToggleSwitch?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="moe.ofs.addon.aarservice.gui.controllers.AirRefuelingServiceControlPanel">
+<AnchorPane fx:id="mainControlPanelContainer" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="moe.ofs.addon.aarservice.gui.controllers.AirRefuelingServiceControlPanel">
    <children>
       <VBox prefHeight="200.0" prefWidth="100.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -16,12 +16,12 @@
                <children>
                   <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Label text="Routes" />
+                        <Label fx:id="mainRouteLabel" text="%mainRouteLabel" />
                         <HBox spacing="5.0">
                            <children>
-                              <Button fx:id="addRouteButton" mnemonicParsing="false" onAction="#addTankerRoute" text="Add Route" />
-                              <Button fx:id="editRouteButton" mnemonicParsing="false" onAction="#editTankerRoute" text="Edit Route" />
-                              <Button fx:id="deleteRouteButton" mnemonicParsing="false" onAction="#deleteTankerRoute" text="Delete Route" />
+                              <Button fx:id="addRouteButton" mnemonicParsing="false" onAction="#addTankerRoute" text="%addRouteButton" />
+                              <Button fx:id="editRouteButton" mnemonicParsing="false" onAction="#editTankerRoute" text="%editRouteButton" />
+                              <Button fx:id="deleteRouteButton" mnemonicParsing="false" onAction="#deleteTankerRoute" text="%deleteRouteButton" />
                            </children>
                         </HBox>
                         <ListView fx:id="routeListView" prefHeight="200.0" prefWidth="200.0" />
@@ -33,16 +33,16 @@
                <children>
                   <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Label text="Services" />
+                        <Label fx:id="mainServiceLabel" text="%mainServiceLabel" />
                         <HBox spacing="5.0">
                            <children>
-                              <Button mnemonicParsing="false" onAction="#addRefuelingService" text="Add Service" />
-                              <Button mnemonicParsing="false" onAction="#editRefuleingService" text="Edit Service" />
-                              <Button mnemonicParsing="false" onAction="#removeRefuelingService" text="Delete Service" />
+                              <Button fx:id="mainServiceAddButton" mnemonicParsing="false" onAction="#addRefuelingService" text="%mainServiceAddButton" />
+                              <Button fx:id="mainServiceEditButton" mnemonicParsing="false" onAction="#editRefuleingService" text="%mainServiceEditButton" />
+                              <Button fx:id="mainServiceDeleteButton" mnemonicParsing="false" onAction="#removeRefuelingService" text="%mainServiceDeleteButton" />
                               <HBox alignment="CENTER_LEFT" spacing="5.0">
                                  <children>
                                     <ToggleSwitch fx:id="autoDispatchToggleSwitch" prefWidth="0.0" />
-                                    <Label text="Auto Dispatch" />
+                                    <Label fx:id="mainAutoDispatchLabel" text="%mainAutoDispatchLabel" />
                                  </children>
                               </HBox>
                            </children>

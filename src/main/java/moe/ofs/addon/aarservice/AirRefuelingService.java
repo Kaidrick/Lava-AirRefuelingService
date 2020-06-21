@@ -13,6 +13,7 @@ import moe.ofs.backend.UTF8Control;
 import moe.ofs.backend.Viewable;
 import moe.ofs.backend.handlers.MissionStartObservable;
 import moe.ofs.backend.services.ParkingInfoService;
+import moe.ofs.backend.util.I18n;
 import net.rgielen.fxweaver.core.FxWeaver;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +39,7 @@ import java.util.Set;
 public class AirRefuelingService implements Plugin, Viewable {
 
     private final String name = "Refueling Service";
-    private final String desc = "Provide auto scheduled air refueling service";
+    private final String desc = "Provides auto scheduled air refueling service";
 
     MissionStartObservable missionStartObservable;
 
@@ -104,6 +105,23 @@ public class AirRefuelingService implements Plugin, Viewable {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getLocalizedName() {
+        ResourceBundle bundle =
+                ResourceBundle.getBundle("AirRefuelingServiceControlPanel",
+                        I18n.getLocale(), new UTF8Control());
+        return I18n.getString(bundle, name);
+    }
+
+    @Override
+    public String getLocalizedDescription() {
+        ResourceBundle bundle =
+                ResourceBundle.getBundle("AirRefuelingServiceControlPanel",
+                        I18n.getLocale(), new UTF8Control());
+
+        return bundle.getString(desc);
     }
 
     @Override

@@ -23,43 +23,43 @@
    <children>
       <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <TextField fx:id="tankerMissionNameTextField" promptText="Tanker Mission Name" />
+            <TextField fx:id="tankerMissionNameTextField" promptText="%tankerMissionNameTextField" />
             <HBox spacing="20.0">
                <children>
                   <VBox spacing="5.0">
                      <children>
-                        <Label text="Airframe Settings" />
-                        <ComboBox fx:id="tankerTypeComboBox" prefWidth="150.0" promptText="Tanker Type" />
-                        <ComboBox fx:id="initialAirdromeComboBox" prefWidth="150.0" promptText="Base Airdrome" />
-                        <ComboBox fx:id="patternComboBox" prefWidth="150.0" promptText="Orbit Pattern" />
+                        <Label fx:id="airframeSettingLabel" text="%airframeSettingLabel" />
+                        <ComboBox fx:id="tankerTypeComboBox" prefWidth="150.0" promptText="%tankerTypeComboBox" />
+                        <ComboBox fx:id="initialAirdromeComboBox" prefWidth="150.0" promptText="%initialAirdromeComboBox" />
+                        <ComboBox fx:id="patternComboBox" prefWidth="150.0" promptText="%patternComboBox" />
                      </children>
                   </VBox>
                   <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <Label text="Comm" />
+                        <Label fx:id="commLabel" text="%commLabel" />
                         <HBox alignment="CENTER_LEFT" spacing="5.0">
                            <children>
-                              <ComboBox fx:id="tankerCallsignComboBox" promptText="Tanker Callsign" />
-                              <TextField fx:id="tankerGroupNumberTextField" prefWidth="60.0" promptText="Group" />
-                              <TextField fx:id="tankerFlightNumberTextField" prefWidth="60.0" promptText="Flight" />
+                              <ComboBox fx:id="tankerCallsignComboBox" promptText="%tankerCallsignComboBox" />
+                              <TextField fx:id="tankerGroupNumberTextField" prefWidth="60.0" promptText="%tankerGroupNumberTextField" />
+                              <TextField fx:id="tankerFlightNumberTextField" prefWidth="60.0" promptText="%tankerFlightNumberTextField" />
                            </children>
                         </HBox>
                         <HBox spacing="5.0">
                            <children>
-                              <TextField fx:id="tankerBeaconChannelTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="60.0" promptText="Channel" />
-                              <ComboBox fx:id="tankerBeaconChannelModeComboBox" promptText="Mode" />
-                              <TextField fx:id="beaconMorseCodeTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="25.0" prefWidth="80.0" promptText="Morse Code" />
+                              <TextField fx:id="tankerBeaconChannelTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="60.0" promptText="%tankerBeaconChannelTextField" />
+                              <ComboBox fx:id="tankerBeaconChannelModeComboBox" promptText="%tankerBeaconChannelModeComboBox" />
+                              <TextField fx:id="beaconMorseCodeTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="25.0" prefWidth="80.0" promptText="%beaconMorseCodeTextField" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" spacing="20.0">
                            <children>
                               <HBox alignment="CENTER_LEFT" spacing="5.0">
                                  <children>
-                                    <TextField fx:id="tankerRadioFrequencyTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="80.0" promptText="Frequency" />
-                                    <Label text="MHz" />
+                                    <TextField fx:id="tankerRadioFrequencyTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="80.0" promptText="%tankerRadioFrequencyTextField" />
+                                    <Label fx:id="unitHertzLabel" text="%unitHertzLabel" />
                                  </children>
                               </HBox>
-                              <CheckBox fx:id="beaconBearingAvailabilityCheckBox" mnemonicParsing="false" text="Bearing Information" />
+                              <CheckBox fx:id="beaconBearingAvailabilityCheckBox" mnemonicParsing="false" text="%beaconBearingAvailabilityCheckBox" />
                            </children>
                         </HBox>
                      </children>
@@ -68,7 +68,7 @@
             </HBox>
             <HBox spacing="5.0">
                <children>
-                  <Label text="RTB Fuel Level" />
+                  <Label fx:id="rtbFuelLevelLabel" text="%rtbFuelLevelLabel" />
                   <HBox alignment="CENTER_LEFT" spacing="5.0">
                      <children>
                         <TextField fx:id="tankerRtbFuelPercentTextField" alignment="TOP_LEFT" disable="true" prefWidth="50.0" />
@@ -80,26 +80,26 @@
             <HBox spacing="5.0">
                <children>
                   <ToggleSwitch disable="true" prefWidth="0.0" />
-                  <Label disable="true" text="Use Magnetic Heading" />
+                  <Label fx:id="useMagHdgCheckBox" disable="true" text="%useMagHdgCheckBox" />
                </children>
             </HBox>
             <HBox spacing="5.0">
                <children>
                   <ToggleSwitch fx:id="customOrbitPatternToggleSwitch" prefWidth="0.0" />
-                  <Label text="Customize Tanker Orbit Pattern" />
+                  <Label fx:id="customOrbPatternCheckBox" text="%customOrbPatternCheckBox" />
                </children>
             </HBox>
             <HBox prefHeight="200.0" spacing="5.0">
                <children>
                   <VBox HBox.hgrow="ALWAYS">
                      <children>
-                        <Label text="Select Service Route" />
+                        <Label fx:id="selectServiceRouteLabel" text="%selectServiceRouteLabel" />
                         <ListView fx:id="routeListView" />
                      </children>
                   </VBox>
                   <VBox HBox.hgrow="ALWAYS">
                      <children>
-                        <Label text="Select Holding Fix" />
+                        <Label fx:id="selectHoldingFixLabel" text="%selectHoldingFixLabel" />
                         <ListView fx:id="anchorPointListView" />
                      </children>
                   </VBox>
@@ -114,9 +114,9 @@
                               <Image url="@../../../../../../hold_pattern_base.png" />
                            </image>
                         </ImageView>
-                        <Label layoutX="87.0" layoutY="52.0" text="INBOUND" />
-                        <Label layoutX="69.0" layoutY="119.0" text="OUTBOUND" />
-                        <Label layoutX="24.0" layoutY="172.0" text="LEFT HAND PATTERN">
+                        <Label fx:id="inboundLabel" alignment="CENTER" layoutX="87.0" layoutY="52.0" text="%inboundLabel" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+                        <Label fx:id="outboundLabel" alignment="CENTER" layoutX="69.0" layoutY="119.0" text="%outboundLabel" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+                        <Label fx:id="leftHandPatternLabel" alignment="CENTER" layoutX="24.0" layoutY="172.0" text="%leftHandPatternLabel" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
                            <font>
                               <Font size="18.0" />
                            </font>
@@ -129,7 +129,7 @@
                            <font>
                               <Font size="18.0" />
                            </font></Label>
-                        <Label layoutX="62.0" layoutY="14.0" text="RACE-TRACK">
+                        <Label fx:id="patternNameLabel" alignment="CENTER" layoutX="62.0" layoutY="14.0" text="%patternNameLabel" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
                            <font>
                               <Font size="18.0" />
                            </font>
@@ -147,16 +147,16 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Label text="Inbound Heading" wrapText="true" />
+                        <Label fx:id="inbHdgLabel" text="%inbHdgLabel" wrapText="true" />
                         <Slider fx:id="patternHeadingSlider" blockIncrement="1.0" majorTickUnit="90.0" max="359.0" maxWidth="-Infinity" GridPane.columnIndex="1" />
-                        <Label text="Leg Length" wrapText="true" GridPane.rowIndex="2" />
+                        <Label fx:id="legLenLabel" text="%legLenLabel" wrapText="true" GridPane.rowIndex="2" />
                         <HBox alignment="CENTER_LEFT" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <children>
                               <TextField fx:id="tankerPatternLegLengthTextField" prefWidth="80.0" />
                               <ComboBox fx:id="patternLegLengthUnitComboBox" prefWidth="80.0" />
                            </children>
                         </HBox>
-                        <Label text="Pattern Altitude" wrapText="true" GridPane.rowIndex="1" />
+                        <Label fx:id="patAltLabel" text="%patAltLabel" wrapText="true" GridPane.rowIndex="1" />
                         <HBox alignment="CENTER_LEFT" layoutX="130.0" layoutY="177.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <children>
                               <TextField fx:id="tankerPatternAltitudeTextField" prefWidth="80.0" />
@@ -167,7 +167,7 @@
                   </GridPane>
                </children>
             </HBox>
-            <Button mnemonicParsing="false" onAction="#generateResult" text="Submit" />
+            <Button fx:id="submitButton" mnemonicParsing="false" onAction="#generateResult" text="Submit" />
          </children>
       </VBox>
    </children>

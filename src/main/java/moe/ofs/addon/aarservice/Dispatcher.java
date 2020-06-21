@@ -97,7 +97,7 @@ public class Dispatcher {
     public void checkTankerStatus() {
         stateWrapperSet.forEach(wrapper -> {
 
-            System.out.println("checkTankerStatus: " + wrapper);
+//            System.out.println("checkTankerStatus: " + wrapper);
 
             // automatically destroy tanker if it's asserted to be stuck or destroyed
             if(wrapper.isTankerStuck(MAX_TANKER_STATIONARY_TIME) || wrapper.isTankerDestroyed()) {
@@ -292,7 +292,6 @@ public class Dispatcher {
                 .setName(tankerService.getTankerMissionName()).build();
 
 
-        System.out.println("before tankerService.setUnit(), setting unit -> " + unit);
         tankerService.setUnit(unit);
 
         List<Unit> units = new ArrayList<>();
@@ -315,8 +314,6 @@ public class Dispatcher {
         // resume should fail if mission database has data but tanker is no longer in sim env
         // if this is the case, redispatch
 
-        System.out.println("tankerService = " + tankerService);
-        // FIXME: getUnit() returns null for some reason
 
         // rebuild the mission group from tanker service
         buildMissionGroup(tankerService);
@@ -327,7 +324,9 @@ public class Dispatcher {
         // creates link
         stateWrapperSet.add(new TankerStateWrapper(tankerService, dispatchedTanker));
 
-        System.out.println(tankerService + " / " + dispatchedTanker);
+
+        log.info("TankerService: " + tankerService + " is re-associated with DispatchedTanker " +
+                dispatchedTanker.getName() + " (" + dispatchedTanker.getRuntimeId() + ")");
     }
 
     // manually destroy tanker object and data
@@ -377,14 +376,10 @@ public class Dispatcher {
 
                 buildMissionGroup(tankerService);
                 resumeDispatch(tankerService, optional.get());
-                System.out.println("resume dispatch info [in h2] for " + tankerService.getTankerMissionName());
-
             } else {
 
                 // TODO --> export object repository does not have data, query DCS
                 int runtimeId = optional.get().getRuntimeId();
-
-                System.out.println("checking in with sim env to query RuntimeId: " + runtimeId);
 
                 boolean unitExistInEnv =
                         new ServerDataRequest(String.format("return tostring(Unit.isExist({ id_ = %d }))",
