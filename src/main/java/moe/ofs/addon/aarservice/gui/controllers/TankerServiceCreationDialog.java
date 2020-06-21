@@ -20,10 +20,7 @@ import org.controlsfx.control.ToggleSwitch;
 import org.springframework.stereotype.Controller;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 @FxmlView
 @Controller
@@ -43,6 +40,12 @@ public class TankerServiceCreationDialog implements Initializable {
 
     @FXML
     private TextField tankerRadioFrequencyTextField;
+
+    @FXML
+    private TextField tankerGroupNumberTextField;
+
+    @FXML
+    private TextField tankerFlightNumberTextField;
 
     @FXML
     private TextField tankerBeaconChannelTextField;
@@ -128,6 +131,16 @@ public class TankerServiceCreationDialog implements Initializable {
         patternComboBox.getSelectionModel().select(OrbitPattern.RACE_TRACK);
 
         Comm comm = tankerService.getComm();
+
+        String callsignName = (String) comm.getCallsign().get("name");
+        String trimmedCallsign = callsignName.substring(0, callsignName.length() - 2);
+        Arrays.stream(TankerCallsign.values())
+                .filter(e -> e.getDisplayName().equals(trimmedCallsign)).findAny()
+                .ifPresent(tankerCallsignComboBox.getSelectionModel()::select);
+
+        tankerGroupNumberTextField.setText(String.valueOf(comm.getCallsign().get(2)));
+        tankerFlightNumberTextField.setText(String.valueOf(comm.getCallsign().get(3)));
+
         tankerRadioFrequencyTextField.setText(String.valueOf(comm.getFrequency()));
         tankerBeaconChannelTextField.setText(String.valueOf(comm.getChannel()));
         tankerBeaconChannelModeComboBox.getSelectionModel().select(comm.getModeChannel());
@@ -169,11 +182,16 @@ public class TankerServiceCreationDialog implements Initializable {
 
             tankerService.setTankerMissionName(tankerMissionName);
 
+            int callsignIndex = tankerCallsignComboBox.getValue().getIndex();
+            int callsignGroupNumber = Integer.parseInt(tankerGroupNumberTextField.getText());
+            int callsignFlightNumber = Integer.parseInt(tankerFlightNumberTextField.getText());
+
             Map<Object, Object> callsign = new HashMap<>();
-            callsign.put(1, tankerCallsignComboBox.getValue().getIndex());
-            callsign.put(2, 1);
-            callsign.put(3, 1);
-            callsign.put("name", tankerCallsignComboBox.getValue() + "11");
+            callsign.put(1, callsignIndex);
+            callsign.put(2, callsignGroupNumber);
+            callsign.put(3, callsignFlightNumber);
+            callsign.put("name", tankerCallsignComboBox.getValue() +
+                    tankerGroupNumberTextField.getText() + tankerFlightNumberTextField.getText());
 
             Comm comm = Comm.builder()
                     .callsign(callsign)

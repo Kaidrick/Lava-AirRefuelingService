@@ -40,8 +40,8 @@
                         <HBox alignment="CENTER_LEFT" spacing="5.0">
                            <children>
                               <ComboBox fx:id="tankerCallsignComboBox" promptText="Tanker Callsign" />
-                              <TextField fx:id="tankerRadioFrequencyTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="80.0" promptText="Frequency" />
-                              <Label text="MHz" />
+                              <TextField fx:id="tankerGroupNumberTextField" prefWidth="60.0" promptText="Group" />
+                              <TextField fx:id="tankerFlightNumberTextField" prefWidth="60.0" promptText="Flight" />
                            </children>
                         </HBox>
                         <HBox spacing="5.0">
@@ -51,7 +51,17 @@
                               <TextField fx:id="beaconMorseCodeTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="25.0" prefWidth="80.0" promptText="Morse Code" />
                            </children>
                         </HBox>
-                        <CheckBox fx:id="beaconBearingAvailabilityCheckBox" mnemonicParsing="false" text="Bearing Information" />
+                        <HBox alignment="CENTER_LEFT" spacing="20.0">
+                           <children>
+                              <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                 <children>
+                                    <TextField fx:id="tankerRadioFrequencyTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="80.0" promptText="Frequency" />
+                                    <Label text="MHz" />
+                                 </children>
+                              </HBox>
+                              <CheckBox fx:id="beaconBearingAvailabilityCheckBox" mnemonicParsing="false" text="Bearing Information" />
+                           </children>
+                        </HBox>
                      </children>
                   </VBox>
                </children>

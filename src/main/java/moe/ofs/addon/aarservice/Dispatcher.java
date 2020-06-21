@@ -97,7 +97,7 @@ public class Dispatcher {
     public void checkTankerStatus() {
         stateWrapperSet.forEach(wrapper -> {
 
-            System.out.println("check " + wrapper);
+            System.out.println("checkTankerStatus: " + wrapper);
 
             // automatically destroy tanker if it's asserted to be stuck or destroyed
             if(wrapper.isTankerStuck(MAX_TANKER_STATIONARY_TIME) || wrapper.isTankerDestroyed()) {
@@ -292,6 +292,7 @@ public class Dispatcher {
                 .setName(tankerService.getTankerMissionName()).build();
 
 
+        System.out.println("before tankerService.setUnit(), setting unit -> " + unit);
         tankerService.setUnit(unit);
 
         List<Unit> units = new ArrayList<>();
@@ -314,6 +315,13 @@ public class Dispatcher {
         // resume should fail if mission database has data but tanker is no longer in sim env
         // if this is the case, redispatch
 
+        System.out.println("tankerService = " + tankerService);
+        // FIXME: getUnit() returns null for some reason
+
+        // rebuild the mission group from tanker service
+        buildMissionGroup(tankerService);
+
+        // associate actual tanker runtime id with tanker service unit
         tankerService.getUnit().setId(dispatchedTanker.getRuntimeId());
 
         // creates link
@@ -369,14 +377,14 @@ public class Dispatcher {
 
                 buildMissionGroup(tankerService);
                 resumeDispatch(tankerService, optional.get());
-                System.out.println("resume dispatch info for " + tankerService.getTankerMissionName());
+                System.out.println("resume dispatch info [in h2] for " + tankerService.getTankerMissionName());
 
             } else {
 
                 // TODO --> export object repository does not have data, query DCS
                 int runtimeId = optional.get().getRuntimeId();
 
-                System.out.println("checking " + runtimeId);
+                System.out.println("checking in with sim env to query RuntimeId: " + runtimeId);
 
                 boolean unitExistInEnv =
                         new ServerDataRequest(String.format("return tostring(Unit.isExist({ id_ = %d }))",
@@ -384,7 +392,7 @@ public class Dispatcher {
 
                 if(unitExistInEnv) {
                     resumeDispatch(tankerService, optional.get());
-                    System.out.println("resume dispatch info for " + tankerService.getTankerMissionName());
+                    System.out.println("resume dispatch info [sim env] for " + tankerService.getTankerMissionName());
                 } else {
                     System.out.println("resume failed for " + tankerService.getTankerMissionName() + ", re-dispatch");
                     deployTanker(tankerService);
@@ -407,6 +415,7 @@ public class Dispatcher {
         // explicitly query dcs to search object
         Point spawnPoint = group.getRoute().getPoint(0);
 
+        // deal with potential unsafe spawn
         if(!spawnManager.isSafeSpawn(new Vector3D(spawnPoint.getX(), 0, spawnPoint.getY()), 10)) {
             System.out.println("unsafe spawn for " + tankerService + ", delay spawn");
 

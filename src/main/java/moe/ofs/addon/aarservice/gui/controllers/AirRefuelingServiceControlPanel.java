@@ -57,7 +57,6 @@ public class AirRefuelingServiceControlPanel implements Initializable, Configura
     @FXML
     private ListView<TankerService> tankerServiceListView;
 
-
     private final FxWeaver fxWeaver;
     private final AirRefuelingService airRefuelingService;
 
